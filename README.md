@@ -47,7 +47,6 @@ I use it to revise concepts and remember key ideas for labs, Packet Tracer, and 
   - [3.4.3 Electronic and Communications Standards](#343-electronic-and-communications-standards)  
   - [3.4.4 Lab – Research Networking Standards](#344-lab--research-networking-standards)  
   - [3.4.5 Check Your Understanding – Standards Organizations](#345-check-your-understanding--standards-organizations)
-
 - [3.5 Reference Models](#35-reference-models)  
   - [3.5.1 The Benefits of Using a Layered Model](#351-the-benefits-of-using-a-layered-model)  
   - [3.5.2 The OSI Reference Model](#352-the-osi-reference-model)  
