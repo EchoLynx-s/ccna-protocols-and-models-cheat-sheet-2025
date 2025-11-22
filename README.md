@@ -12,12 +12,10 @@ I use it to revise concepts and remember key ideas for labs, Packet Tracer, and 
 
 - [Module 3 Overview](#module-3-overview)  
 - [Module Map](#module-map)
-
 - [3.0 Introduction](#30-introduction)  
   - [3.0.1 Why should I take this module?](#301-why-should-i-take-this-module)  
   - [3.0.2 What will I learn to do in this module?](#302-what-will-i-learn-to-do-in-this-module)  
   - [3.0.3 Class Activity – Design a Communications System](#303-class-activity---design-a-communications-system)
-
 - [3.1 The Rules](#31-the-rules)  
   - [3.1.1 Video – Devices in a Bubble](#311-video--devices-in-a-bubble)  
   - [3.1.2 Communications Fundamentals](#312-communications-fundamentals)  
@@ -31,13 +29,11 @@ I use it to revise concepts and remember key ideas for labs, Packet Tracer, and 
   - [3.1.10 Message Delivery Options](#3110-message-delivery-options)  
   - [3.1.11 A Note About the Node Icon](#3111-a-note-about-the-node-icon)  
   - [3.1.12 Check Your Understanding – The Rules](#3112-check-your-understanding--the-rules)
-
 - [3.2 Protocols](#32-protocols)  
   - [3.2.1 Network Protocol Overview](#321-network-protocol-overview)  
   - [3.2.2 Network Protocol Functions](#322-network-protocol-functions)  
   - [3.2.3 Protocol Interaction](#323-protocol-interaction)  
   - [3.2.4 Check Your Understanding – Protocols](#324-check-your-understanding--protocols)
-
 - [3.3 Protocol Suites](#33-protocol-suites)  
   - [3.3.1 Network Protocol Suites](#331-network-protocol-suites)  
   - [3.3.2 Evolution of Protocol Suites](#332-evolution-of-protocol-suites)  
@@ -45,7 +41,6 @@ I use it to revise concepts and remember key ideas for labs, Packet Tracer, and 
   - [3.3.4 TCP/IP Protocol Suite](#334-tcpip-protocol-suite)  
   - [3.3.5 TCP/IP Communication Process](#335-tcpip-communication-process)  
   - [3.3.6 Check Your Understanding – Protocol Suites](#336-check-your-understanding--protocol-suites)
-
 - [3.4 Standards Organizations](#34-standards-organizations)  
   - [3.4.1 Open Standards](#341-open-standards)  
   - [3.4.2 Internet Standards](#342-internet-standards)  
@@ -59,7 +54,6 @@ I use it to revise concepts and remember key ideas for labs, Packet Tracer, and 
   - [3.5.3 The TCP/IP Protocol Model](#353-the-tcpip-protocol-model)  
   - [3.5.4 OSI and TCP/IP Model Comparison](#354-osi-and-tcpip-model-comparison)  
   - [3.5.5 Packet Tracer – Investigate the TCP/IP and OSI Models in Action](#355-packet-tracer--investigate-the-tcpip-and-osi-models-in-action)
-
 - [3.6 Data Encapsulation](#36-data-encapsulation)  
   - [3.6.1 Segmenting Messages](#361-segmenting-messages)  
   - [3.6.2 Sequencing](#362-sequencing)  
@@ -67,7 +61,6 @@ I use it to revise concepts and remember key ideas for labs, Packet Tracer, and 
   - [3.6.4 Encapsulation Example](#364-encapsulation-example)  
   - [3.6.5 De-encapsulation Example](#365-de-encapsulation-example)  
   - [3.6.6 Check Your Understanding – Data Encapsulation](#366-check-your-understanding--data-encapsulation)
-
 - [3.7 Data Access](#37-data-access)  
   - [3.7.1 Addresses](#371-addresses)  
   - [3.7.2 Layer 3 Logical Address](#372-layer-3-logical-address)  
@@ -80,7 +73,6 @@ I use it to revise concepts and remember key ideas for labs, Packet Tracer, and 
   - [3.7.9 Lab – Install Wireshark](#379-lab--install-wireshark)  
   - [3.7.10 Lab – Use Wireshark to View Network Traffic](#3710-lab--use-wireshark-to-view-network-traffic)  
   - [3.7.11 Check Your Understanding – Data Access](#3711-check-your-understanding--data-access)
-
 - [3.8 Module Practice and Quiz](#38-module-practice-and-quiz)  
   - [3.8.1 What did I learn in this module?](#381-what-did-i-learn-in-this-module)  
   - [3.8.2 Module Quiz – Protocols and Models](#382-module-quiz--protocols-and-models)
