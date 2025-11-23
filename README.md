@@ -418,3 +418,224 @@ This visual convention keeps protocol and delivery diagrams simple and easy to r
   - Unicast / multicast / broadcast concepts
 - I use this section just to verify that I really understand the communication “rules” before moving on to the next topic.
 
+---
+
+### 3.2 Protocols
+
+#### 3.2.1 Network Protocol Overview
+- Network protocols are shared rules and formats that let devices exchange messages.
+- Implemented in software, hardware, or both; each protocol has its own function and header format.
+
+**Types of protocols:**
+
+- **Network Communications Protocols**  
+  - Allow devices to communicate over one or more networks.  
+  - Examples: Ethernet, IP, TCP, HTTP, and many others.
+
+- **Network Security Protocols**  
+  - Protect data (authentication, integrity, encryption).  
+  - Examples: SSH, SSL, TLS.
+
+- **Routing Protocols**  
+  - Let routers share routing information, compare paths, and choose the best route.  
+  - Examples: OSPF, BGP.
+
+- **Service Discovery Protocols**  
+  - Automatically discover devices or services.  
+  - Examples: DHCP (IP address allocation), DNS (name ↔ IP translation).
+
+---
+
+#### 3.2.2 Network Protocol Functions
+Network communication protocols handle several key functions:
+
+- **Addressing**  
+  - Identifies sender and receiver using a defined addressing scheme.  
+  - Examples: Ethernet MAC, IPv4, IPv6.
+
+- **Reliability**  
+  - Guarantees delivery or recovery if messages are lost/corrupted in transit.  
+  - Example: TCP reliability mechanisms.
+
+- **Flow Control**  
+  - Ensures data flows at a rate that both devices can handle (prevents overwhelming the receiver).
+
+- **Sequencing**  
+  - Numbers each segment of data so the receiver can reassemble information in the correct order.
+
+- **Error Detection**  
+  - Detects if bits were corrupted during transmission (checksums, FCS, etc.).  
+  - Examples: Ethernet, IPv4, IPv6, TCP all include error-detection fields.
+
+- **Application Interface**  
+  - Defines how applications talk over the network.  
+  - Examples: HTTP/HTTPS when a browser talks to a web server.
+
+---
+
+#### 3.2.3 Protocol Interaction
+Real communications use **multiple protocols together** as a stack.
+
+Example: browsing a web page
+
+- **HTTP**  
+  - Controls how the web client (browser) and web server format and exchange requests/responses.
+
+- **TCP**  
+  - Manages the conversation between client and server: connection, reliability, sequencing, and flow control.
+
+- **IP**  
+  - Delivers packets from the source host to the destination host across one or more networks.
+
+- **Ethernet**  
+  - Delivers frames from one NIC to another on the local LAN.
+
+Each layer focuses on its own job and relies on the lower layers to move the data across the network.
+
+---
+
+#### 3.2.4 Check Your Understanding – Protocols
+- Quick quiz to verify you remember:
+  - Types of protocols (communications, security, routing, service discovery).
+  - Main protocol functions (addressing, reliability, flow control, sequencing, error detection, application interface).
+  - How protocols interact in a stack (HTTP → TCP → IP → Ethernet).
+
+---
+
+### 3.3 Protocol Suites
+
+#### 3.3.1 Network Protocol Suites
+- A **protocol suite** = group of related protocols that work together to perform a full communication function.
+- You can picture it as a **stack of layers**:
+  - **Physical layer** – how bits/voices are physically sent (copper, fiber, radio… or people speaking).
+  - **Rules layer** – agreements about *how* to communicate (language, take turns, signal when finished).
+  - **Content layer** – the actual message (“Where is the café?”).
+- In networking, multiple protocols in different layers cooperate to move data and make sense of it at the destination.
+
+---
+
+#### 3.3.2 Evolution of Protocol Suites
+Several protocol suites existed over time:
+
+- **TCP/IP Suite**
+  - Most common + relevant today.
+  - Open standard maintained by the **IETF**.
+  - Layers: Application, Transport, Internet, Network Access.
+
+- **OSI Protocols**
+  - Family of protocols from **ISO** + **ITU** (1977).
+  - Introduced the famous **7-layer OSI model**.
+  - Today mostly used as a **reference model**, not as a full protocol stack.
+
+- **AppleTalk**
+  - Proprietary suite from Apple (1985).
+  - Replaced by TCP/IP when Apple adopted IP in 1995.
+
+- **Novell NetWare**
+  - Proprietary NetWare/IPX suite from Novell (1983).
+  - Novell later adopted TCP/IP around 1995 and dropped IPX.
+
+*Bottom line:* TCP/IP “won” and is now the universal protocol suite; others are mostly historical.
+
+---
+
+#### 3.3.4 TCP/IP Protocol Suite
+
+TCP/IP is organized in 4 layers. Each layer has typical protocols:
+
+##### Application Layer
+Used directly (or indirectly) by applications.
+
+- **Name System**
+  - **DNS** – translates domain names (e.g. `cisco.com`) to IP addresses.
+
+- **Host Config**
+  - **DHCPv4 / DHCPv6** – dynamically hand out IPv4 / IPv6 addresses and options.
+  - **SLAAC** – lets IPv6 hosts self-configure addresses without a DHCPv6 server.
+
+- **Email**
+  - **SMTP** – sends mail from client → mail server, and server → server.
+  - **POP3** – downloads mail from server to local client.
+  - **IMAP** – accesses and manages mail directly on the server.
+
+- **File Transfer**
+  - **FTP** – reliable, connection-oriented file transfer, with acknowledgements.
+  - **SFTP** – file transfer over SSH (encrypted).
+  - **TFTP** – simple, connectionless file transfer (best-effort, no acknowledgements).
+
+- **Web & Web Services**
+  - **HTTP** – transfers web pages and other content.
+  - **HTTPS** – HTTP over TLS; encrypted web traffic.
+  - **REST** – style of web APIs using HTTP verbs/URLs to build web services.
+
+---
+
+##### Transport Layer
+Handles host-to-host conversations.
+
+- **TCP**
+  - Connection-oriented, reliable.
+  - Provides acknowledgements, sequencing, flow control.
+
+- **UDP**
+  - Connectionless, “best effort”.
+  - No delivery guarantee, no built-in recovery (used where speed/low overhead matters).
+
+---
+
+##### Internet Layer
+Logical addressing and routing.
+
+- **Internet Protocol**
+  - **IPv4** – 32-bit addresses, packets.
+  - **IPv6** – 128-bit addresses, newer IP version.
+  - **NAT** – translates private IPv4 addresses ↔ public IPv4 addresses.
+
+- **Messaging (ICMP family)**
+  - **ICMPv4** – error + status messages for IPv4 (e.g. ping).
+  - **ICMPv6** – similar for IPv6.
+  - **ICMPv6 ND** – Neighbor Discovery (address resolution, duplicate detection, etc.).
+
+- **Routing Protocols**
+  - **OSPF** – link-state IGP, area-based, open standard.
+  - **EIGRP** – Cisco-developed advanced IGP, uses composite metrics.
+  - **BGP** – main protocol used between ISPs and large organizations (inter-domain routing).
+
+---
+
+##### Network Access Layer
+Physical + data link rules.
+
+- **Address Resolution**
+  - **ARP** – maps IPv4 addresses ↔ MAC addresses (Layer 2).
+
+- **Data Link Protocols**
+  - **Ethernet** – rules for wiring/signaling and framing on local networks.
+  - **WLAN (Wi-Fi)** – rules for wireless signaling on 2.4 GHz / 5 GHz, etc.
+
+---
+
+#### 3.3.5 TCP/IP Communication Process
+
+**Example: web server → client**
+
+1. **At the server (encapsulation)**
+   - Application generates **Data** (web page).
+   - **TCP** wraps it into a **TCP segment** (adds ports, reliability info).
+   - **IP** wraps segment into an **IP packet** (adds source/destination IPs).
+   - **Ethernet/WLAN** wraps packet into a **frame** (adds MAC addresses, FCS).
+   - Bits are sent across the physical medium (copper, fiber, radio).
+
+2. **Across the network**
+   - Each router/switch looks at the relevant header (IP or MAC) to forward the frame/packet.
+   - Data moves hop-by-hop until it reaches the client.
+
+3. **At the client (de-encapsulation)**
+   - Frame is received; data link layer checks FCS, strips frame header → passes **IP packet** up.
+   - Network layer processes IP header, strips it → passes **TCP segment** up.
+   - Transport layer reorders, checks reliability, strips header → passes **application data** up.
+   - Application (web browser) renders the page.
+
+*Key idea:* each layer adds its own header on the way out (encapsulation) and strips it off in reverse order on the way in (de-encapsulation).
+
+---
