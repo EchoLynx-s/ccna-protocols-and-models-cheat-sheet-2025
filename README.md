@@ -639,3 +639,230 @@ Physical + data link rules.
 *Key idea:* each layer adds its own header on the way out (encapsulation) and strips it off in reverse order on the way in (de-encapsulation).
 
 ---
+
+
+### 3.4 Standards Organizations
+
+**Big idea:**  
+Networks only work because vendors agree on common standards. Different organizations define and maintain those standards so that devices and software from many manufacturers can interoperate.
+
+---
+
+#### 3.4.1 Open Standards
+
+- **Open standards** = public specifications that any vendor can implement.
+- Examples in networking: IPv4, IPv6, DHCP, SLAAC, Ethernet, 802.11 WLAN, TCP/IP.
+- **Why they matter**
+  - Interoperability – devices from different vendors can work together.
+  - Competition – users are not locked into one manufacturer.
+  - Innovation – vendors can build new features on top of shared standards.
+- Standards orgs are usually **vendor-neutral, non-profit** groups that publish these documents.
+
+---
+
+#### 3.4.2 Internet Standards
+
+Main players involved in internet / TCP-IP standards:
+
+- **ISOC – Internet Society**  
+  Promotes open development and use of the internet worldwide.
+
+- **IAB – Internet Architecture Board**  
+  Overall technical and architectural oversight for internet standards.
+
+- **IETF – Internet Engineering Task Force**  
+  - Develops, updates, and maintains internet and TCP/IP standards.  
+  - Publishes **RFCs (Request for Comments)**.  
+  - Organized into many working groups (routing, security, etc.).
+
+- **IRTF – Internet Research Task Force**  
+  - Focuses on long-term research related to internet and TCP/IP protocols.  
+  - Works through research groups (e.g., crypto, anti-spam).
+
+- **ICANN – Internet Corporation for Assigned Names and Numbers**  
+  - Coordinates IP address allocation and domain names.  
+  - Manages top-level domains and DNS root.
+
+- **IANA – Internet Assigned Numbers Authority**  
+  - Operated under ICANN.  
+  - Maintains global registries for IP addresses, **TCP/UDP port numbers**, and other protocol parameters.
+
+---
+
+#### 3.4.3 Electronic and Communications Standards
+
+Other organizations focus on the **physical and telecom** layers:
+
+- **IEEE – Institute of Electrical and Electronics Engineers**  
+  - Huge engineering standards body.  
+  - Defines networking standards such as **802.3 Ethernet** and **802.11 WLAN**.
+
+- **EIA – Electronic Industries Alliance**  
+  - Known for standards related to electrical wiring, connectors, and 19-inch equipment racks.
+
+- **TIA – Telecommunications Industry Association**  
+  - Develops communication standards for structured cabling, radio, cellular, VoIP, satellite, etc.
+
+- **ITU-T – International Telecommunication Union – Telecommunication Standardization Sector**  
+  - UN-level organization.  
+  - Defines global telecom standards (e.g., DSL, IPTV, many transmission and signaling standards).
+
+---
+
+#### 3.4.4 Lab – Research Networking Standards
+
+**Goal of the lab**
+
+- **Part 1 – Research networking standards organizations**
+  - Look up major standards bodies and concepts such as:  
+    ISO, ITU, ICANN, IANA, IEEE, EIA, TIA, ISOC, IAB, IETF, W3C, RFCs, Wi-Fi Alliance, important individuals (e.g., Jon Postel, Vint Cerf).
+  - Answer questions about:
+    - Who publishes RFCs.
+    - Who manages domain names and IP address allocation.
+    - Who defines web standards (W3C).
+    - Examples of specific standards (Ethernet, Wi-Fi security, etc.).
+
+- **Part 2 – Reflection**
+  - Reflect on how standards enable the modern internet and global commerce.
+  - Think about what would break if each vendor used its own incompatible protocols.
+
+---
+
+#### 3.4.5 Check Your Understanding – Standards Organizations
+
+Short **4-question quiz** that checks if you can:
+
+- Match orgs to their responsibilities (IETF vs ICANN vs IEEE vs ITU, etc.).
+- Recognize which bodies control domain names, IPs, ports, and which define physical/network standards.
+
+
+===
+
+### 3.5 Reference Models
+
+#### 3.5.1 The Benefits of Using a Layered Model
+
+- We can’t watch packets moving across a real network, so we use **models** to visualise what’s happening.
+- A **layered model** breaks the network into manageable pieces (layers) with clear responsibilities.
+- Benefits of a layered model:
+  - Makes protocol design easier: each layer has defined inputs/outputs and services.
+  - Devices/protocols from different vendors can interoperate (as long as they follow the same layer rules).
+  - Changes/updates in one layer don’t force changes in other layers (good modularity).
+  - Encourages competition (vendors can innovate at one layer).
+  - Provides a common language to talk about networking functions and capabilities.
+- Two main reference models:
+  - **OSI Reference Model** (7 layers)
+  - **TCP/IP Reference Model** (4 layers)
+
+---
+
+#### 3.5.2 The OSI Reference Model
+
+Seven layers (top → bottom):
+
+1. **Application (Layer 7)**  
+   - Interfaces directly with user applications.  
+   - Provides services like HTTP, SMTP, FTP, DNS, etc.
+
+2. **Presentation (Layer 6)**  
+   - Data format and representation (encryption, compression, character sets).  
+   - Ensures the data is in a usable format for the application.
+
+3. **Session (Layer 5)**  
+   - Starts, manages, and ends dialogs (sessions) between applications.  
+   - Handles dialog control and synchronization.
+
+4. **Transport (Layer 4)**  
+   - Segments data, ensures end-to-end delivery.  
+   - Reliability, flow control, error recovery (e.g. TCP).
+
+5. **Network (Layer 3)**  
+   - Logical addressing and routing between networks (IP).  
+   - Decides the best path through the network.
+
+6. **Data Link (Layer 2)**  
+   - Moves frames across a single link or LAN.  
+   - MAC addressing, framing, error detection on the link.
+
+7. **Physical (Layer 1)**  
+   - Actual bits on the wire/fiber/air.  
+   - Electrical/optical signalling, connectors, media, physical topologies.
+
+> OSI layers are often referred to by **number** (Layer 1, Layer 2, etc.) as well as by name.
+
+---
+
+#### 3.5.3 The TCP/IP Protocol Model
+
+Four layers (top → bottom):
+
+1. **Application**  
+   - What the user sees: web, email, file transfer, etc.  
+   - Includes many protocols: HTTP, HTTPS, DNS, SMTP, FTP, etc.  
+   - Also handles some encoding and dialog control that OSI would put in Session/Presentation.
+
+2. **Transport**  
+   - Process-to-process delivery between hosts.  
+   - Main protocols:
+     - **TCP** – reliable, connection-oriented.
+     - **UDP** – unreliable, connectionless, low overhead.
+
+3. **Internet**  
+   - Chooses the best path through the network.  
+   - Logical addressing and routing (IPv4, IPv6, ICMP, routing protocols, etc.).
+
+4. **Network Access**  
+   - How data is actually placed on the physical network.  
+   - Combines OSI’s Data Link + Physical functions.  
+   - Includes Ethernet, WLAN, and other link-layer technologies.
+
+---
+
+#### 3.5.4 OSI and TCP/IP Model Comparison
+
+- **Layer mapping:**
+
+  - **TCP/IP Application** ⟷ OSI **Application + Presentation + Session**  
+  - **TCP/IP Transport** ⟷ OSI **Transport**  
+  - **TCP/IP Internet** ⟷ OSI **Network**  
+  - **TCP/IP Network Access** ⟷ OSI **Data Link + Physical**
+
+- **Similarities**
+  - Both models use **layers** to describe networking functions.
+  - Both highlight **Transport** and **Network/Internet** as key for end-to-end communication.
+  - Both are used as reference points when discussing protocols and troubleshooting.
+
+- **Differences**
+  - OSI separates Presentation and Session; TCP/IP rolls them into the Application layer.
+  - OSI splits Data Link and Physical; TCP/IP combines them as Network Access.
+  - OSI is mostly a **theoretical** model; TCP/IP grew directly from the **real protocol suite** used on the internet.
+
+---
+
+#### 3.5.5 Packet Tracer – Investigate the TCP/IP and OSI Models in Action
+
+- Goal: Use **Packet Tracer Simulation mode** to watch how data is encapsulated and de-encapsulated across the network while fetching a web page. :contentReference[oaicite:0]{index=0}  
+
+- **Scenario**
+  - A **Web Client** requests a page from **www.osi.local** on a **Web Server**.
+  - Simulation mode shows each step as animated PDUs moving between devices.
+
+- **Key tasks**
+  - Switch from **Realtime** to **Simulation** mode and filter for **HTTP** events.
+  - Generate HTTP traffic by browsing to `www.osi.local` from the Web Client.
+  - Step through events with **Capture/Forward** and open each PDU:
+    - View **OSI Model** tab: see which layers are active and what each one is doing.
+    - View **Outbound / Inbound PDU Details**: see headers for Ethernet, IP, TCP, HTTP, DNS, etc.
+  - Observe:
+    - How data is **encapsulated** as it moves down the stack (Application → Transport → Internet → Network Access).
+    - How it is then **de-encapsulated** at the destination.
+    - How **DNS** resolves `www.osi.local` to an IP address.
+    - How **TCP** sets up (ESTABLISHED) and tears down the connection.
+    - Which **ports** are used (e.g. HTTP, DNS).
+
+- **Big idea**
+  - The lab visually ties together:
+    - OSI vs TCP/IP layers,
+    - PDU names and headers,
+    - and how real protocols (HTTP, TCP, IP, Ethernet, DNS) cooperate to deliver a simple web page.
+
