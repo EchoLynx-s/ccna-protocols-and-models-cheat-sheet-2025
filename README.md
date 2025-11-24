@@ -866,3 +866,485 @@ Four layers (top → bottom):
     - PDU names and headers,
     - and how real protocols (HTTP, TCP, IP, Ethernet, DNS) cooperate to deliver a simple web page.
 
+---
+
+### 3.6 Data Encapsulation
+
+Encapsulation is how data is prepared for transmission across the network.  
+Each layer adds its own header (and sometimes trailer), turning the original message into smaller, well-labeled units that can travel efficiently and be reassembled correctly.
+
+---
+
+#### 3.6.1 Segmenting Messages
+
+A single large communication (video, email with big attachments, etc.) is **not** sent as one huge stream of bits.
+
+**Segmentation**
+
+- The message is divided into smaller pieces (segments) before transmission.
+- Each segment can be sent separately, possibly over different paths.
+- At the destination, segments are reassembled into the original message.
+
+**Benefits**
+
+- **Increased speed** – Because the data stream is split into packets, large amounts of data can be sent without one conversation monopolizing the link. Many different conversations can share the same network (multiplexing).
+- **Increased efficiency** – If a single segment is lost, only that segment needs to be retransmitted instead of the entire original message.
+
+---
+
+#### 3.6.2 Sequencing
+
+Once a message is segmented, the pieces must be kept in order.
+
+- Each segment is given a **sequence number**.
+- The receiver uses sequence numbers to:
+  - Detect missing segments.
+  - Reassemble the data in the correct order.
+
+> In TCP, sequencing is what allows out-of-order segments to be rebuilt into the original data stream.
+
+---
+
+#### 3.6.3 Protocol Data Units (PDUs)
+
+As data moves **down** or **up** the protocol stack, its form and name change.  
+At each layer, a new header (and sometimes trailer) is attached, creating a different **Protocol Data Unit (PDU)**:
+
+- **Data** – Generic term for the PDU at the **application layer**.
+- **Segment** – PDU at the **transport layer** (TCP/UDP header + data).
+- **Packet** – PDU at the **network layer** (IP header + segment).
+- **Frame** – PDU at the **data link layer** (frame header + packet + frame trailer).
+- **Bits** – PDU at the **physical layer** (electrical/optical/radio signals on the medium).
+
+> If the transport header is **TCP**, the transport PDU is called a **segment**.  
+> If the transport header is **UDP**, it is often called a **datagram**.
+
+---
+
+#### 3.6.4 Encapsulation Example (Server → Client)
+
+Example: a web server sending a web page to a client.
+
+1. **Application layer** (HTTP) creates the web page data.
+2. **Transport layer** (TCP) adds its header → creates a **TCP segment**.
+3. **Network layer** (IP) adds an IP header → creates an **IP packet**.
+4. **Data link layer** (Ethernet) adds a frame header and trailer → creates an **Ethernet frame**.
+5. **Physical layer** converts the frame into **bits** and sends them across the medium.
+
+Each lower layer treats the PDU from the layer above as **data** and wraps it with its own control information.
+
+---
+
+#### 3.6.5 De-encapsulation Example (Client → Application)
+
+At the receiving host, the process is reversed:
+
+1. **Physical layer** receives the **bits** and reconstructs the **Ethernet frame**.
+2. **Data link layer** checks the frame (e.g., FCS), strips its header/trailer, and passes the **IP packet** up.
+3. **Network layer** reads the IP header, delivers the packet to the correct host, removes the IP header, and passes the **TCP segment** up.
+4. **Transport layer** (TCP) uses ports and sequence numbers to reassemble the correct data stream, then passes the **application data** up.
+5. **Application layer** (e.g., web browser) interprets the data and displays the web page.
+
+This reverse process is **de-encapsulation**: headers/trailers are removed layer by layer until only the original application data remains.
+
+---
+
+## 3.7 Data Access
+
+In the previous sections you saw how data is **segmented, encapsulated and addressed**.  
+This topic focuses on **how addresses at different layers** are used to get data from a source device to its final destination.
+
+On a typical Ethernet/IP network, **two OSI layers are responsible for delivering data end-to-end**:
+
+- **Layer 3 – Network layer (IP)**  
+  Logical addressing (IPv4/IPv6) used to deliver packets between networks.
+
+- **Layer 2 – Data Link layer (Ethernet, WLAN, …)**  
+  Physical / MAC addressing used to move frames from **one NIC to the next** on the local link.
+
+---
+
+### 3.7.1 Addresses
+
+To move data across the network, each layer adds its own “addressing info”:
+
+| OSI Layer        | What is added / used                                                                 |
+|------------------|--------------------------------------------------------------------------------------|
+| **Physical (L1)**| Timing, synchronization, voltage/light/wave patterns (no real address fields)       |
+| **Data Link (L2)**| **Source & destination MAC addresses** – who sends and who receives the frame on this link |
+| **Network (L3)** | **Source & destination IP addresses** – original sender and final receiver          |
+| **Transport (L4)**| **Source & destination port numbers** – which application/process is talking       |
+| **Upper layers** | Encoded application data (HTTP request, email, file data, etc.)                     |
+
+> **Important:**  
+> - Layer 3 addresses = **where the packet is going globally**.  
+> - Layer 2 addresses = **who handles the frame next on this local network segment**.
+
+---
+
+### 3.7.2 Layer 3 Logical Address
+
+A **logical address** is an address that is independent of the underlying hardware. On IP networks this is the **IP address**.
+
+Example from the course:
+
+- **PC1**: `192.168.1.110`  
+- **Web Server**: `172.16.1.99`  
+- Routers in between: `R1`, `R2`
+
+PC1 sends an IP packet to the Web Server. Inside that packet:
+
+- **Source IP**: `192.168.1.110` – “I am the original sender”
+- **Destination IP**: `172.16.1.99` – “This is the final receiver”
+
+These two IP addresses **stay the same along the whole path** from PC1 to the Web Server, no matter how many routers are in between.
+
+#### Structure of an IP address
+
+An IPv4 address has **two logical parts**:
+
+1. **Network portion** (IPv4) / **Prefix** (IPv6)  
+   - Identifies the **network**.  
+   - All devices on the same network share this part.
+
+2. **Host portion** (IPv4) / **Interface ID** (IPv6)  
+   - Identifies the **individual device** on that network.  
+   - Must be unique **within that network**.
+
+The **subnet mask** (IPv4) or **prefix length** (IPv6, e.g. `/64`) defines **where the split occurs** between network and host portion.
+
+---
+
+### 3.7.3 Devices on the Same Network
+
+Now consider PC1 sending data to an **FTP server on the same IPv4 network**.
+
+Example addresses:
+
+- **PC1**
+  - IPv4: `192.168.1.110`
+  - MAC: `AA-AA-AA-AA-AA-AA`
+- **FTP Server**
+  - IPv4: `192.168.1.9`
+  - MAC: `CC-CC-CC-CC-CC-CC`
+
+Because the **network part of the IPv4 address is the same** (`192.168.1.x`):
+
+- PC1 knows the server is **local**, not remote.
+- PC1 can send frames **directly** to the server’s MAC address (no router needed).
+
+Inside the frame:
+
+- **Data Link header**
+  - Destination MAC = `CC-CC-CC-CC-CC-CC` (FTP server)
+  - Source MAC      = `AA-AA-AA-AA-AA-AA` (PC1)
+- **Network (IP) header**
+  - Source IP       = `192.168.1.110`
+  - Destination IP  = `192.168.1.9`
+- **Payload**
+  - TCP segment, FTP data, etc.
+
+---
+
+### 3.7.4 Role of the Data Link Layer Addresses – Same IP Network
+
+On a **single Ethernet LAN**, Layer 2 is responsible for getting frames from one NIC to another.
+
+- **Source MAC address**
+  - MAC of the **sending NIC** (here: PC1).
+  - Burned into the NIC by the manufacturer (can be overridden but conceptually “physical”).
+
+- **Destination MAC address**
+  - MAC of the **receiving NIC** (here: FTP server).
+
+For local traffic:
+
+1. PC1 creates an IP packet for `192.168.1.9`.
+2. PC1 checks: “Is `192.168.1.9` on my network?”  
+   Yes → no router needed.
+3. PC1 looks up the server’s MAC address (e.g. using **ARP**).
+4. PC1 builds an Ethernet frame with:
+   - **Src MAC** = PC1 MAC
+   - **Dst MAC** = FTP server MAC
+   - Payload    = IP packet
+5. The switch forwards the frame to the port where the FTP server is connected.
+
+Result: the frame goes **PC1 → Switch → FTP server** without leaving the local network.
+
+---
+
+### 3.7.5 Devices on a Remote Network
+
+Now imagine PC1 wants to talk to a **web server on a different network**:
+
+- **PC1**: `192.168.1.110`
+- **Web Server**: `172.16.1.99`
+- **Default gateway (R1)**: `192.168.1.1`
+- Another router **R2** between R1 and the server.
+
+Because the network portions differ (`192.168.1.x` vs `172.16.1.x`):
+
+- PC1 **cannot reach the server directly** on the local link.
+- PC1 must send the frame to its **default gateway (R1)** instead.
+
+On the first hop (PC1 → R1):
+
+- **IP header**
+  - Source IP      = `192.168.1.110` (PC1)
+  - Destination IP = `172.16.1.99` (Web Server) ← note: *final target already set*
+- **Ethernet header**
+  - Source MAC     = PC1 MAC (`AA-AA-AA-AA-AA-AA`)
+  - Destination MAC= R1’s interface MAC on this LAN (`11-11-11-11-11-11`)
+
+R1 receives the frame, strips the L2 header, **keeps the IP header**, decides the next hop, then builds a new frame to send towards R2:
+
+- IP header: **unchanged**
+  - Source IP      = `192.168.1.110`
+  - Destination IP = `172.16.1.99`
+- New Ethernet header for link R1 → R2:
+  - Source MAC     = R1’s outgoing interface MAC
+  - Destination MAC= R2’s interface MAC (`22-22-22-22-22-22`)
+
+This pattern repeats until the frame reaches the web server’s LAN.
+
+> **Key idea:**  
+> - **IP addresses stay the same from end to end.**  
+> - **MAC addresses change at every hop** (every different physical network).
+
+---
+
+### 3.7.6 Role of the Network Layer Addresses
+
+Layer 3 (IP) provides **end-to-end delivery between networks**.  
+Using our remote‐network example:
+
+- **Source IPv4 address**:  
+  - `192.168.1.110` (PC1) – original sender.
+
+- **Destination IPv4 address**:  
+  - `172.16.1.99` (Web Server) – final receiver.
+
+At every router:
+
+1. The router **examines the destination IP**.
+2. It consults its **routing table** to choose the best next hop.
+3. It encapsulates the packet in a new Layer 2 frame appropriate for the outgoing interface.
+
+Because the network parts of the source and destination IP addresses are different:
+
+- The packet must cross **multiple Layer 3 networks**.
+- Only routers (Layer 3 devices) can **forward** the packet between those networks.
+
+Meanwhile, Layer 2:
+
+- Only ensures delivery of the frame **over a single link** (one hop).
+- Uses MAC addresses of the **current sender** and **current next hop**.
+
+---
+
+#### 3.7.7 Role of the Data Link Layer Addresses – Different IP Networks
+
+When the **source and destination are on different IP networks**, the Layer-2 frame **cannot**
+be sent directly to the final device. Instead, it must first go to the **default gateway**.
+
+Example in the figure:
+
+- **PC1**
+  - IP: `192.168.1.110`
+  - MAC: `AA-AA-AA-AA-AA-AA`
+- **R1 (default gateway)**
+  - IP: `192.168.1.1`
+  - MAC: `11-11-11-11-11-11`
+- **R2**
+  - IP: `172.16.1.1`
+  - MAC: `22-22-22-22-22-22`
+- **Web Server**
+  - IP: `172.16.1.99`
+  - MAC: `AB-CD-EF-12-34-56`
+
+For the **first hop** (PC1 → R1):
+
+- **Layer 3 (IP header)**
+  - Source IP: `192.168.1.110` (PC1)
+  - Destination IP: `172.16.1.99` (Web Server – final target)
+- **Layer 2 (Ethernet frame header)**
+  - Source MAC: `AA-AA-AA-AA-AA-AA` (PC1 NIC)
+  - Destination MAC: `11-11-11-11-11-11` (R1 NIC)
+
+Key ideas:
+
+- The **IP addresses already point all the way to the web server**, even though it’s on a
+  different network.
+- The **Ethernet frame** only cares about delivering the packet to the **next hop**  
+  (here: the default gateway R1).
+- Once R1 receives the frame, it strips off the old Layer-2 header and builds a **new frame**
+  with its own MAC as the source and the next hop’s MAC as the destination.
+
+So:
+- **Layer 3 addresses = end-to-end**
+- **Layer 2 addresses = link-by-link (hop-by-hop)**
+
+---
+
+#### 3.7.8 Data Link Addresses (Host to Router, Router to Router, Router to Server)
+
+This section walks through how the **Layer 2 header changes at every hop**, while the  
+**Layer 3 header stays the same** from PC1 to the Web Server.
+
+##### Host to Router (PC1 → R1)
+
+- **L3 Source IP:** `192.168.1.110` (PC1)  
+- **L3 Destination IP:** `172.16.1.99` (Web Server)
+
+- **L2 Source MAC:** PC1 NIC  
+- **L2 Destination MAC:** R1 NIC (default gateway)
+
+PC1 wraps the IP packet in an Ethernet frame destined for the router’s NIC, not the server.
+
+##### Router to Router (R1 → R2)
+
+R1 receives the frame, removes the old L2 header, examines the IP header, and forwards it
+towards the next router R2.
+
+- **L3 Source IP:** `192.168.1.110` (unchanged)  
+- **L3 Destination IP:** `172.16.1.99` (unchanged)
+
+- **L2 Source MAC:** R1 outgoing interface  
+- **L2 Destination MAC:** R2 incoming interface
+
+Again, only the **Ethernet header is replaced**; the IP addresses stay the same.
+
+##### Router to Server (R2 → Web Server)
+
+R2 repeats the process and forwards the packet to the final destination network.
+
+- **L3 Source IP:** `192.168.1.110`  
+- **L3 Destination IP:** `172.16.1.99`
+
+- **L2 Source MAC:** R2 NIC  
+- **L2 Destination MAC:** Web Server NIC
+
+The web server finally receives a frame addressed directly to its own MAC.
+
+##### Hop-by-Hop vs End-to-End (Summary Table)
+
+| Hop              | L2 Source MAC      | L2 Destination MAC   | L3 Source IP      | L3 Destination IP |
+|------------------|--------------------|----------------------|-------------------|-------------------|
+| PC1 → R1         | PC1 MAC            | R1 MAC               | 192.168.1.110     | 172.16.1.99       |
+| R1 → R2          | R1 outgoing MAC    | R2 MAC               | 192.168.1.110     | 172.16.1.99       |
+| R2 → Web Server  | R2 MAC             | Web Server MAC       | 192.168.1.110     | 172.16.1.99       |
+
+- **L3 (IP) stays constant** from sender to receiver.
+- **L2 (MAC) is rewritten** at every hop to match the NICs on that specific link.
+
+---
+
+#### 3.7.9 Lab – Install Wireshark
+
+Goal: get Wireshark ready so you can capture and inspect real traffic.
+
+High-level steps:
+
+1. **Download** Wireshark from the official site for your OS.
+2. **Run the installer** and accept the defaults (including installing the capture driver
+   like Npcap/WinPcap on Windows).
+3. After installation, **launch Wireshark**.
+4. You should see a list of network interfaces (Wi-Fi, Ethernet, etc.) ready for capture.
+
+This lab is mostly about setup so future labs can focus on packet analysis.
+
+---
+
+#### 3.7.10 Lab – Use Wireshark to View Network Traffic
+
+This lab has two parts and focuses on **ICMP (ping) traffic** and how **IP + MAC addresses**
+appear in captured frames.
+
+##### Part 1 – Capture & Analyze Local ICMP (same LAN)
+
+1. On Windows, run:
+
+   ```bash
+   ipconfig /all
+   ```
+
+   and note:
+   - Your **IPv4 address**
+   - Your **NIC description**
+   - Your **MAC (Physical) address**
+
+2. Ask a teammate for their **IP address** on the same LAN.
+
+3. Open **Wireshark**, start a capture on the correct interface.
+
+4. In the filter bar, type:
+
+   ```text
+   icmp
+   ```
+
+   and apply the filter so only ping packets are shown.
+
+5. In a command prompt, ping your teammate’s IP:
+
+   ```bash
+   ping 192.168.1.x
+   ```
+
+6. Back in Wireshark, select one of the **ICMP Echo Request** frames and expand:
+   - **Ethernet II** to see:
+     - Source MAC → your PC’s MAC
+     - Destination MAC → teammate’s MAC
+   - **Internet Protocol** to see:
+     - Source IP → your IP
+     - Destination IP → teammate’s IP
+   - **ICMP** to see the type (echo request/reply).
+
+Concepts to note:
+
+- On a **local network**, the frame’s **destination MAC is the MAC of the actual target host**.
+- Your PC learns that MAC address using ARP / local discovery before sending the frame.
+
+##### Part 2 – Capture & Analyze Remote ICMP (different network)
+
+1. Start a new capture in Wireshark (you can discard the previous one).
+2. From a command prompt, ping some public domains, for example:
+
+   ```bash
+   ping www.yahoo.com
+   ping www.cisco.com
+   ping www.google.com
+   ```
+
+3. DNS will translate each name into an IP address – note those IPs.
+
+4. In Wireshark, look at the ICMP request frames for each ping:
+
+   - **IP header**
+     - Destination IP = public IP of Yahoo / Cisco / Google
+   - **Ethernet header**
+     - Destination MAC **is not** the web server’s MAC.
+     - Destination MAC = your **default gateway’s MAC** (the local router).
+
+Key conclusions:
+
+- For **remote destinations**, the **MAC address in your frame always belongs to your
+  default gateway/router**, because the first hop is to the router.
+- You can see the **real MACs of local hosts**, but never the MAC of remote hosts — each
+  router along the path replaces the frame with one that uses MAC addresses valid on its
+  current link.
+
+---
+
+#### 3.7.11 Check Your Understanding – Data Access
+
+- Final quiz for this section with **6 questions**.
+- Focus points you should be able to explain from memory:
+  - Difference between **Layer 2 (MAC)** and **Layer 3 (IP)** addressing.
+  - How addresses look when devices are on the **same network** vs a **remote network**.
+  - Why **MAC addresses change hop-by-hop**, while **IP addresses stay end-to-end**.
+  - The role of the **default gateway** in reaching remote networks.
+  - How tools like **Wireshark** reveal this behavior in real traffic.
+
+If you can sketch the path PC1 → R1 → R2 → Web Server and label **L2 and L3 addresses at
+each hop**, you’re in a good place for this quiz.
