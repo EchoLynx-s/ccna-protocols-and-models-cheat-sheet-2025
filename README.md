@@ -1336,15 +1336,577 @@ Key conclusions:
 
 ---
 
-#### 3.7.11 Check Your Understanding – Data Access
+## 3.7.11 – Check Your Understanding: Data Access
 
-- Final quiz for this section with **6 questions**.
-- Focus points you should be able to explain from memory:
-  - Difference between **Layer 2 (MAC)** and **Layer 3 (IP)** addressing.
-  - How addresses look when devices are on the **same network** vs a **remote network**.
-  - Why **MAC addresses change hop-by-hop**, while **IP addresses stay end-to-end**.
-  - The role of the **default gateway** in reaching remote networks.
-  - How tools like **Wireshark** reveal this behavior in real traffic.
+### Question 1  
+**Prompt:** Frames exchanged between devices in different IP networks must be forwarded to a default gateway.  
+**Answer:** `True`
 
-If you can sketch the path PC1 → R1 → R2 → Web Server and label **L2 and L3 addresses at
-each hop**, you’re in a good place for this quiz.
+**Explanation:**  
+- A frame can only be sent directly on the local Layer 2 network (same broadcast domain).  
+- When the **source and destination IP addresses are on different networks**, the sender cannot reach the destination host directly – it has no way to know the destination’s MAC address.  
+- Instead, the sender forwards the frame to its **default gateway** (usually a router).  
+- The frame’s **destination MAC** is the MAC of the default gateway, while the **destination IP** is the final host.  
+- The router then forwards the packet toward the remote network, rebuilding a new data-link frame for the next hop.  
+
+So any traffic to a different IP network must be sent to a default gateway first.
+
+---
+
+### Question 2  
+**Prompt:** The right-most part of an IP address is used to identify the network that a device belongs to.  
+**Answer:** `False`
+
+**Explanation:**  
+- An IP address is split into a **network portion** and a **host portion**.  
+- By convention:  
+  - The **left-most bits** represent the **network**.  
+  - The **right-most bits** represent the **host** on that network.  
+- Which exact bits belong to the network or host is determined by the **subnet mask**, but in all cases the network part is on the left side.
+
+Therefore, the right-most part of an IP address identifies the **host**, not the network.
+
+---
+
+### Question 3  
+**Prompt:** What is used to determine the network portion of an IPv4 address?  
+**Answer:** `Subnet mask`
+
+**Explanation:**  
+- The IPv4 address alone does **not** say how many bits are network vs. host.  
+- The **subnet mask** (for example `255.255.255.0`) tells us which bits are the **network**:  
+  - Bits set to `1` in the mask → network bits.  
+  - Bits set to `0` in the mask → host bits.  
+- Routers and hosts use the subnet mask to decide:  
+  - “Is this destination on my local network?”  
+  - “Do I send it directly, or to the default gateway?”
+
+So the subnet mask is the tool that defines the network portion of an IPv4 address.
+
+---
+
+### Question 4  
+**Prompt:** Which statements are true regarding network-layer and data link-layer addresses? (Choose three.)
+
+**Correct answers:**
+
+1. `Network layer addresses are logical and data link addresses are expressed as 12 hexadecimal digits.`  
+2. `Network layer addresses are either 32 or 128 bits in length.`  
+3. `Data link layer addresses are physical and network layer addresses are logical.`  
+
+**Explanation:**
+
+Let’s evaluate each statement:
+
+1. **“Data link layer addresses are logical and network layer addresses are physical.”**  
+   - Incorrect. This is reversed.  
+   - **Network-layer** addresses (IPv4 / IPv6) are **logical** (assigned, can be changed).  
+   - **Data-link** addresses (MAC) are **physical** (burned into the NIC, though they can be overridden).
+
+2. **“Network layer addresses are logical and data link addresses are expressed as 12 hexadecimal digits.”** ✅  
+   - Correct on both parts:  
+     - IP addresses are **logical**.  
+     - A standard MAC address is **48 bits**, shown as **12 hex digits** (e.g. `AA-BB-CC-DD-EE-FF`).
+
+3. **“Network layer addresses are expressed as 12 hexadecimal digits and data link layer addresses are decimal.”**  
+   - Incorrect.  
+   - IP addresses are not fixed to 12 hex digits; IPv4 is usually written as dotted decimal (`192.168.1.10`), IPv6 as 32 hex digits.  
+   - MAC addresses are written in **hex**, not decimal.
+
+4. **“Network layer addresses are either 32 or 128 bits in length.”** ✅  
+   - Correct.  
+     - IPv4 → **32 bits**.  
+     - IPv6 → **128 bits**.
+
+5. **“Data link layer addresses are 32 bits in length.”**  
+   - Incorrect.  
+   - Standard Ethernet MAC addresses are **48 bits** long.
+
+6. **“Data link layer addresses are physical and network layer addresses are logical.”** ✅  
+   - Correct description of the two layers’ addressing types.
+
+Therefore, the correct three checkboxes are **(2), (4), and (6)**.
+
+---
+
+### Question 5  
+**What is the order of the two addresses in the data link frame?**
+
+**Correct answer:** `Destination MAC, source MAC`
+
+**Explanation:**  
+At Layer 2 (Data Link), an Ethernet frame header always starts with the **Destination MAC address**, followed by the **Source MAC address**.  
+The reason is that every device on the LAN needs to very quickly decide whether the frame is meant for it (or for a broadcast/multicast group). Putting the **destination address first** lets the NIC check that field immediately:
+
+`[ Destination MAC ][ Source MAC ][ EtherType ][ Payload ][ FCS ]`
+
+So the address order in the data link frame is **Destination MAC → Source MAC**, not the other way around.
+
+---
+
+### Question 6  
+**Prompt:** Data link addresses are physical so they never change in the data link frame from source to destination.  
+**Answer:** `False`
+
+**Explanation:**  
+- A MAC address identifies a **single network interface card (NIC)** on a single link.  
+- When a packet crosses multiple hops (PC → router → router → server), each hop is a **separate Layer 2 link**.  
+- At every hop:  
+  - The router **removes** the old data-link header and **builds a new one** for the next link.  
+  - The **source MAC** becomes the NIC of the device sending on that link.  
+  - The **destination MAC** becomes the NIC of the next hop (router or final host).  
+- The **IP addresses stay the same end-to-end**, but the **MAC addresses change at every hop**.
+
+Therefore, data-link addresses **do change** in the frame as it moves from source to destination across multiple networks.
+
+---
+
+## 3.8.1 Module Practice and Quiz – What did I learn in this module?
+
+### 1. The Rules of Communication
+
+All communication methods (human or networked) have **three elements in common**:
+
+- **Message source (sender)**
+- **Message destination (receiver)**
+- **Channel (medium)** – the path the message uses
+
+In networks, sending a message is governed by **rules called protocols**.  
+Common requirements that protocols must define:
+
+- **Identified sender and receiver** – who is talking to whom
+- **Common language and grammar** – common format/structure of the data
+- **Encoding and formatting** – how data is turned into bits for transmission and back again
+- **Message size** – how big each piece can be
+- **Timing**  
+  - *Flow control* – how fast data can be sent  
+  - *Response timeout* – how long to wait for a reply  
+  - *Access method* – who can talk when, to avoid collisions
+- **Acknowledgement / confirmation rules** – how to know a message arrived
+
+**Delivery options** for messages:
+
+- **Unicast** – one sender to one receiver
+- **Multicast** – one sender to selected group receivers
+- **Broadcast** – one sender to all devices in a network segment
+
+---
+
+### 2. Protocols
+
+Protocols are implemented by **end devices** (PCs, servers, phones) and **intermediary devices** (switches, routers, APs).  
+A single communication usually uses **several protocols together**, each with a specific job and format.
+
+Typical protocol families you met in this module:
+
+- **Network communication protocols:** IP, TCP, HTTP, etc.
+- **Network security protocols:** SSH, SSL/TLS (encryption, integrity, authentication)
+- **Routing protocols:** OSPF, BGP (exchange and choose best paths)
+- **Service discovery protocols:** DHCP, DNS (automatic addressing, name-to-IP mapping)
+
+Key protocol *functions*:
+
+- **Addressing**
+- **Reliability**
+- **Flow control**
+- **Sequencing**
+- **Error detection**
+- **Application interface** (how apps talk to the network)
+
+---
+
+### 3. Protocol Suites
+
+A **protocol suite** = group of related protocols that work together to perform a communication function.
+
+You can visualize a suite as a **stack of layers**, where:
+
+- Lower layers focus on **moving bits/frames/packets** across physical media.
+- Upper layers focus on **application data and services**.
+
+Historically there were many suites (OSI, AppleTalk, IPX/SPX…), but today networks are dominated by the:
+
+- **TCP/IP protocol suite** – used on the internet and most modern networks.
+
+Important properties of TCP/IP:
+
+- **Open standard protocol suite** – specs are public; any vendor can implement them.
+- **Standards-based protocol suite** – approved by standards bodies so devices from different vendors interoperate.
+
+The TCP/IP suite handles:
+
+- Web client/server communication (HTTP/HTTPS)
+- Encapsulating a web page into TCP segments, IP packets and Ethernet frames at the server
+- De-encapsulating those units at the client for display in the browser
+
+---
+
+### 4. Standards Organizations
+
+Because many vendors build network hardware and software, **standards organizations** keep everything compatible.
+
+**Open standards**:
+
+- Encourage **interoperability, competition and innovation**
+- Prevent any one vendor from monopolizing the market
+- Give us a **freely accessible, open internet**
+
+Key groups:
+
+- **ISOC** – Internet Society (promotes open internet development)
+- **IAB** – Internet Architecture Board (overall management of internet standards)
+- **IETF** – Internet Engineering Task Force (writes & maintains TCP/IP standards as RFCs)
+- **IRTF** – Internet Research Task Force (long-term research on internet technologies)
+- **ICANN** – Internet Corporation for Assigned Names and Numbers (domain names & IP allocation policy)
+- **IANA** – Internet Assigned Numbers Authority (actual allocation of IPs, ports, protocol numbers)
+- **IEEE** – Institute of Electrical and Electronics Engineers (Ethernet, Wi-Fi and many other technical standards)
+- **EIA, TIA, ITU-T** – other organizations defining cabling, telecoms and broadband standards
+
+---
+
+### 5. Reference Models
+
+Reference models give us a **common language** to describe where protocols and functions sit in a stack.
+
+#### OSI Reference Model (7 layers)
+
+From top to bottom:
+
+1. **Application** – user-facing app protocols (HTTP, FTP, etc.)
+2. **Presentation** – data representation, encryption, compression
+3. **Session** – manages sessions/dialogs between hosts
+4. **Transport** – segmentation, reliability, flow control (TCP/UDP)
+5. **Network** – logical addressing and routing (IP)
+6. **Data Link** – framing and physical addressing (MAC)
+7. **Physical** – signaling on the medium (bits on wire/fiber/air)
+
+> In practice we often refer to these as “Layer 1…Layer 7”.
+
+#### TCP/IP Model (4 layers)
+
+From top to bottom:
+
+1. **Application** – combines OSI Application/Presentation/Session
+2. **Transport** – same role as OSI transport
+3. **Internet** – OSI network functions (IP routing)
+4. **Network Access** – OSI data link + physical
+
+The two models describe the **same general stack** from different perspectives; OSI is more detailed, TCP/IP is simpler and closely matches real protocols.
+
+---
+
+### 6. Data Encapsulation
+
+**Segmenting messages** = splitting a large stream of data into smaller units for transmission.
+
+Benefits:
+
+- **Increased speed** – multiple conversations can share the same link (multiplexing).
+- **Increased efficiency** – if one piece is lost, only that piece is retransmitted.
+
+As data is prepared for transmission, each layer adds its own header/trailer.  
+These layer-specific data forms are called **Protocol Data Units (PDUs)**:
+
+- **Data** – application layer PDU
+- **Segment** – transport layer PDU (TCP/UDP)
+- **Packet** – network layer PDU (IP)
+- **Frame** – data link layer PDU (Ethernet, Wi-Fi)
+- **Bits** – physical layer PDU (on the wire/air)
+
+**Encapsulation**: top → bottom (Application to Physical)  
+Each lower layer treats the entire PDU from the layer above as its **payload**.
+
+**De-encapsulation**: bottom → top (Physical to Application)  
+Each layer strips off its own header/trailer and passes the remaining PDU up.
+
+---
+
+### 7. Data Access & Addressing
+
+The **network** and **data link** layers are responsible for actually **delivering** data from source to destination.
+
+Each uses its own kind of addresses:
+
+#### Network Layer (Layer 3) – Logical Addresses
+
+- Uses **IP addresses** (IPv4 / IPv6).
+- Responsible for delivering packets from **original source** to **final destination**, even across multiple networks.
+- IP addresses are **end-to-end**: they’re the same at every hop along the path.
+
+An IP address has two parts:
+
+- **Network portion (IPv4)** / **Prefix (IPv6)** – identifies which network the host belongs to.
+- **Host portion (IPv4)** / **Interface ID (IPv6)** – identifies the specific device on that network.
+
+The **subnet mask (IPv4)** or **prefix-length (IPv6)** is what tells us where “network” ends and “host” begins.
+
+#### Data Link Layer (Layer 2) – Physical Addresses
+
+- Uses **MAC addresses** on Ethernet/WLAN.
+- Responsible for delivering frames **from one NIC to another NIC on the same network**.
+- MAC addresses are **hop-by-hop**:  
+  - At each hop, the router strips the old Layer 2 header and adds a new one for the next hop.
+
+##### Same IP Network
+
+- Source and destination IPs are on the **same network portion**.
+- The frame’s **destination MAC** is the MAC of the **target host**.
+- The frame is sent **directly** from source NIC to destination NIC.
+
+##### Different IP Networks
+
+- Source and destination IPs have **different network portions**.
+- The sender cannot reach the destination host directly at Layer 2.
+- The frame’s **destination MAC** is the MAC of the **default gateway/router**.
+- The router forwards the packet towards the remote network, rewriting the Layer 2 header at each hop.
+
+Because of this:
+
+- **Network layer addresses are logical and stay constant end-to-end.**
+- **Data link layer addresses are physical and change at each hop.**
+
+---
+
+### 8. High-Level Module Takeaways
+
+- All communication follows **rules (protocols)** that define addressing, timing, and delivery behavior.
+- Modern networks use the **TCP/IP protocol suite**, structured in layers and defined by **open standards**.
+- **Standards organizations** (IETF, IEEE, ICANN, IANA, etc.) ensure cross-vendor interoperability.
+- The **OSI** and **TCP/IP** reference models provide a common language to map protocols and functions.
+- **Encapsulation** and **de-encapsulation** explain how data moves through the stack and across the network.
+- **Segmentation** and **multiplexing** improve performance and reliability.
+- **Network layer (IP)** and **Data link layer (MAC)** addressing together ensure that data can travel from a specific application on one device to a specific application on another device, even across multiple intermediate networks.
+
+---
+
+## 3.8.2 Module Quiz – Protocols and Models
+
+### Question 1  
+**Which three acronyms/initialisms represent standards organizations? (Choose three.)**
+
+**Answer:** `IEEE`, `IANA`, `IETF`
+
+**Explanation:**  
+- **IEEE** (Institute of Electrical and Electronics Engineers) creates many LAN and Wi-Fi standards (e.g. 802.3, 802.11).  
+- **IANA** (Internet Assigned Numbers Authority) manages IP address blocks, DNS root zones, and protocol numbers.  
+- **IETF** (Internet Engineering Task Force) writes and maintains internet standards as RFCs.  
+
+`TCP/IP` is a **protocol suite**, `MAC` is a **type of address**, and `OSI` is a **reference model**, not standards bodies.
+
+---
+
+### Question 2  
+**What type of communication will send a message to all devices on a local area network?**
+
+**Answer:** `Broadcast`
+
+**Explanation:**  
+A **broadcast** transmission is addressed to “all hosts” on the LAN (e.g. IPv4 255.255.255.255 or an Ethernet broadcast MAC of FF:FF:FF:FF:FF:FF). Every device on that network segment processes the frame.  
+- **Unicast** → one-to-one  
+- **Multicast** → one-to-many (specific group)  
+- **Allcast** → not a standard term in this context.
+
+---
+
+### Question 3  
+**In computer communication, what is the purpose of message encoding?**
+
+**Answer:** `To convert information to the appropriate form for transmission`
+
+**Explanation:**  
+**Encoding** transforms data into a suitable format for transmission across the medium (electrical signals, light, radio waves, or a specific bit pattern).  
+- **Decoding** is the reverse: interpreting the received data.  
+- Breaking messages into smaller units is **segmentation**, not encoding.  
+- Negotiating timing relates to **flow control** or **synchronization**, not encoding.
+
+---
+
+### Question 4  
+**Which message delivery option is used when all devices need to receive the same message simultaneously?**
+
+**Answer:** `Broadcast`
+
+**Explanation:**  
+When **all hosts** on the network must receive the same data at the same time (e.g. ARP requests, some service announcements), the sender uses a **broadcast**.  
+- **Multicast** targets a **subset** of hosts that joined a multicast group, not necessarily all devices.  
+- **Unicast** sends to a single destination.  
+- **Duplex** describes direction of communication (half/full), not delivery scope.
+
+---
+
+### Question 5  
+**What are two benefits of using a layered network model? (Choose two.)**
+
+**Answers:**  
+1. `It assists in protocol design.`  
+2. `It prevents technology in one layer from affecting other layers.`  
+
+**Explanation:**  
+Layered models (OSI, TCP/IP) provide several benefits:
+
+- **Assists in protocol design:** Each layer has clear responsibilities and interfaces, so protocol designers can focus on one layer at a time and know how it interacts with the layers above and below.
+- **Isolates changes:** Because layers are modular, **technology can change inside one layer** (e.g. new Wi-Fi standard at Layer 2) **without forcing changes to other layers** (IP, TCP, HTTP still work the same).
+
+The other options are incorrect or misleading:
+
+- “Ensures a device at one layer can function at the next higher layer” – layers interact, but a “device at one layer” is not how the model is described.  
+- “Prevents designers from creating their own model” – people can and do define new models; this is not a goal.  
+- “Speeds up packet delivery” – layering mainly helps design and interoperability; it doesn’t inherently make packets faster.
+
+---
+
+### Question 6  
+**What is the purpose of protocols in data communications?**
+
+**Answer:** `Providing the rules required for a specific type of communication to occur`
+
+**Explanation:**  
+A **protocol** is a set of **rules** that defines how devices communicate: format of messages, timing, error handling, addressing, etc. For example, HTTP defines how web clients and servers exchange requests and responses.  
+
+Protocols do **not**:  
+- Dictate the actual **content** of the message (that’s up to applications/users).  
+- Specify the exact **bandwidth** of the channel.  
+- Specify which **operating systems** may be used.
+
+---
+
+### Question 7  
+**Which logical address is used for delivery of data to a remote network?**
+
+**Answer:** `Destination IP address`
+
+**Explanation:**  
+To deliver data to a **remote network** (not on the same local subnet), routers use the **destination IP address** to determine the best path through the internetwork.  
+
+- **MAC addresses** are **physical (data-link) addresses** and typically only have meaning on the local network segment; they change at each hop.  
+- **Source IP** is important for replies and tracking, but delivery is based on the **destination IP**.  
+- **Port numbers** identify applications at the transport layer, not which remote network to reach.
+
+---
+
+### Question 8  
+**What is the general term that is used to describe a piece of data at any layer of a networking model?**
+
+**Answer:** `Protocol data unit`
+
+**Explanation:**  
+A **Protocol Data Unit (PDU)** is the generic term for “a chunk of data plus its headers/trailers” at any layer. Each layer has a more specific name:  
+
+- Application layer – **data**  
+- Transport layer – **segment** (TCP) / **datagram** (UDP)  
+- Network layer – **packet**  
+- Data link layer – **frame**
+
+“Frame”, “packet”, and “segment” are all PDUs, but only **PDU** is the general term.
+
+---
+
+### Question 9  
+**Which two protocols function at the internet layer? (Choose two.)**
+
+**Answers:** `IP`, `ICMP`
+
+**Explanation:**  
+In the TCP/IP model, the **Internet layer** is responsible for logical addressing and routing. Common Internet-layer protocols include:
+
+- **IP (Internet Protocol)** – provides logical addressing and routing of packets.  
+- **ICMP (Internet Control Message Protocol)** – used for error messages and operational queries (e.g. ping, traceroute).
+
+Other options are different layers:
+
+- **POP** – email retrieval protocol at the **application** layer.  
+- **PPP** – Point-to-Point Protocol, used at the **network access** (data link) layer.  
+- **BOOTP** – bootstrapping/host configuration protocol, treated as **application** layer in this course.
+
+---
+
+### Question 10  
+**Which layer of the OSI model defines services to segment and reassemble data for individual communications between end devices?**
+
+**Answer:** `Transport` layer
+
+**Explanation:**  
+The **Transport layer (Layer 4)** is responsible for:
+
+- **Segmentation** – breaking large application data streams into smaller segments.  
+- **Reassembly** – putting those segments back together at the receiver.  
+- **End-to-end communication services** like reliability, flow control, and multiplexing using port numbers (TCP/UDP).
+
+Other layers:
+
+- **Application (7)** – provides network services to end-user applications.  
+- **Presentation (6)** – translation, encryption, compression.  
+- **Session (5)** – manages dialog/ sessions.  
+- **Network (3)** – logical addressing and routing, but not segmentation/reassembly of application data.
+
+---
+
+### Question 11  
+**Which type of communication will send a message to a group of host destinations simultaneously?**
+
+**Answer:** Multicast  
+
+**Explanation:**  
+- **Unicast** = one-to-one (single sender → single receiver).  
+- **Broadcast** = one-to-all (single sender → every device on the network).  
+- **Multicast** = one-to-many, but only to a **specific group** of interested hosts.  
+- **Anycast** = one-to-nearest (delivered to the “closest” host in a group, not all of them).  
+
+Because the question says *“a group of host destinations”* (not all hosts), this is exactly what **multicast** does.
+
+---
+
+### Question 12  
+**What process is used to receive transmitted data and convert it into a readable message?**
+
+**Answer:** Decoding  
+
+**Explanation:**  
+When data is sent, it is first **encoded** into signals (electrical, optical, or radio) for transmission over the medium.  
+At the receiving side, the reverse operation happens: the device must **decode** those signals back into bits and then into meaningful data so the application can understand it. Access control, flow control, and encapsulation are all other networking functions, but **only decoding** describes the process of turning received signals into a readable message.
+
+---
+
+### Question 13  
+**What is done to an IP packet before it is transmitted over the physical medium?**
+
+**Answer:** It is encapsulated in a Layer 2 frame.  
+
+**Explanation:**  
+The OSI/TCP-IP models send data **down the stack** before it hits the wire.  
+Once you have an IP packet at **Layer 3 (Network)**, the next step is **Layer 2 (Data Link)**, which wraps that packet inside a **frame** (adds a Layer-2 header and trailer: MAC addresses, FCS, etc.).  
+Only *after* this encapsulation into a Layer-2 frame can the data be converted to bits and sent over the physical medium. So the correct action is: **encapsulate the IP packet in a Layer-2 frame**.
+
+---
+
+### Question 14  
+**What process is used to place one message inside another message for transfer from the source to the destination?**
+
+**Answer:** Encapsulation  
+
+**Explanation:**  
+**Encapsulation** is the process where each layer takes the data from the layer above and **wraps it** with its own header (and sometimes trailer).  
+Example for a web request:  
+- Application layer creates HTTP data.  
+- Transport layer encapsulates it into a TCP segment.  
+- Network layer encapsulates that into an IP packet.  
+- Data link layer encapsulates the packet into a frame.  
+
+Each step is “one message inside another message”, which is exactly what the question describes.
+
+---
+
+### Question 15  
+**A web client is sending a request for a webpage to a web server. From the perspective of the client, what is the correct order of the protocol stack that is used to prepare the request for transmission?**
+
+**Answer:** **HTTP, TCP, IP, Ethernet**  
+
+**Explanation:**  
+From the client’s point of view, data flows **from top to bottom** through the TCP/IP stack:
+
+1. **HTTP** – Application layer builds the web request.  
+2. **TCP** – Transport layer adds ports, reliability, sequencing.  
+3. **IP** – Internet layer adds logical addressing and routing (source/destination IPs).  
+4. **Ethernet** – Network Access layer adds MAC addresses and prepares the frame for the physical medium.
+
+So the order of protocols used to prepare the request is **HTTP → TCP → IP → Ethernet**.
